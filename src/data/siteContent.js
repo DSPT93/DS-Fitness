@@ -3,12 +3,12 @@
 // nothing else in the code needs to change.
 
 export const business = {
-  name: "Reform Personal Training",
-  shortName: "Reform PT",
+  name: "DS Fitness",
+  shortName: "DS Fitness",
   trainerName: "Your Name",
   tagline: "Strength, coached with care.",
   location: "Lewisham & South East London",
-  email: "hello@reformpt.example",
+  email: "hello@dsfitness.example",
   phone: "07000 000000",
   instagram: "https://instagram.com",
 };
