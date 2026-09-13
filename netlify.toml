@@ -1,0 +1,36 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# API routes -> serverless functions. These must come before the SPA
+# catch-all below so they aren't swallowed by it.
+[[redirects]]
+  from = "/api/admin/schedule"
+  to = "/.netlify/functions/admin-schedule"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/bookings"
+  to = "/.netlify/functions/admin-bookings"
+  status = 200
+
+[[redirects]]
+  from = "/api/availability"
+  to = "/.netlify/functions/availability"
+  status = 200
+
+[[redirects]]
+  from = "/api/book"
+  to = "/.netlify/functions/book"
+  status = 200
+
+# Single-page app fallback so client-side routes (e.g. /about, /booking)
+# resolve correctly on a hard refresh or direct link.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
