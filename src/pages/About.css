@@ -74,6 +74,11 @@
   margin: 0 auto;
 }
 
+.about-cta-sub {
+  color: rgba(253, 250, 246, 0.75);
+  margin-bottom: 28px;
+}
+
 @media (min-width: 720px) {
   .about-story-grid {
     grid-template-columns: 0.9fr 1.1fr;

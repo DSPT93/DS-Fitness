@@ -4,7 +4,7 @@
 
 export const business = {
   name: "DS Training",
-  trainerName: "Your Name",
+  trainerName: "David",
   tagline: "Strength, coached with care.",
   location: "Chiswick & Bush Hill Park",
   email: "hello@dstraining.example",

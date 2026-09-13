@@ -134,9 +134,8 @@ export default function Home() {
             <p className="eyebrow">Meet your trainer</p>
             <h2 className="trainer-intro-title">A bit about me</h2>
             <p className="trainer-intro-copy">
-              Replace this paragraph with your own story — your background, what got you into
-              training, and the way you like to coach. This is the spot to make it personal
-              before someone books a consultation.
+              Fitness never came naturally to me but wanting to live better did. Training allowed
+              me to become my best self and move better on a daily basis.
             </p>
             <Link to="/about" className="btn btn-ghost">
               Read my full story

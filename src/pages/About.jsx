@@ -30,8 +30,9 @@ export default function About() {
             Hi, I'm {business.trainerName}.
           </Reveal>
           <Reveal as="p" delay={0.1} className="about-lede">
-            I help people build strength, move without pain, and feel more like themselves —
-            through training that fits into real life, not the other way round.
+            I help people lose weight, get stronger and feel better within themselves. We do
+            this with structured training sessions and planning that is actually based around
+            you.
           </Reveal>
         </div>
       </section>
@@ -45,19 +46,25 @@ export default function About() {
           </Reveal>
 
           <Reveal className="about-copy" direction="left" delay={0.1}>
-            <h2>My approach</h2>
+            <h2>My story</h2>
             <p>
-              I trained for years chasing programmes that looked good on paper but didn't fit
-              real, busy lives. Now I coach the way I wish I'd been coached — sessions built
-              around your goals, your joints, your energy, and the time you actually have.
+              I help people feel better because I know how it feels to not be your best self.
+              Seven years ago I was at my heaviest weight and unhealthy. Training had never
+              crossed my mind, but I knew that I was feeling my worst. At 25 years old, I was
+              facing the reality that putting my shoes on had become a tricky task because I
+              was so big.
             </p>
             <p>
-              Whether that's in-person sessions, a call, or fully remote coaching, the process
-              starts the same way: a conversation, not a sales pitch.
+              Change was needed and little did I know, it was right around the corner. I joined
+              a gym and started working out with a good friend who had some experience within
+              the gym. The gym became the key to change that I needed. Training was fun,
+              exciting and motivating. This was so strong a feeling that I decided I wanted to
+              help other people who may have felt how I did back then.
             </p>
             <p>
-              Replace this paragraph with your own certifications, background and story once
-              you're ready to make the site yours.
+              Weighing 115kg and moving better than I ever have, we find ourselves here seven
+              years on. Now it is time for me to help you feel your best self and to not feel
+              how I did back then.
             </p>
           </Reveal>
         </div>
@@ -81,8 +88,12 @@ export default function About() {
 
       <section className="section section-dark about-cta">
         <div className="container about-cta-inner">
-          <Reveal as="h2">Let's talk about your goals.</Reveal>
-          <Reveal delay={0.1}>
+          <Reveal as="h2">Ready to feel your best self?</Reveal>
+          <Reveal as="p" delay={0.08} className="about-cta-sub">
+            Book in for a free consultation and let's start planning how we can get you feeling
+            your best self.
+          </Reveal>
+          <Reveal delay={0.16}>
             <Link to="/booking" className="btn btn-primary">
               Book your free consultation today
             </Link>
