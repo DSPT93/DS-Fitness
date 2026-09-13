@@ -26,7 +26,7 @@ export default function Nav() {
     <header className={`nav ${scrolled ? "nav-scrolled" : ""} ${open ? "nav-menu-open" : ""}`}>
       <div className="nav-inner container">
         <NavLink to="/" className="nav-brand" onClick={() => setOpen(false)}>
-          {business.shortName}
+          <img src="/logo.png" alt={business.name} className="nav-brand-logo" />
         </NavLink>
 
         <div className="nav-actions">

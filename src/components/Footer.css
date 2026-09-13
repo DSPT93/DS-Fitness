@@ -12,10 +12,10 @@
   border-bottom: 1px solid var(--color-line-dark);
 }
 
-.footer-name {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  margin-bottom: 4px;
+.footer-logo {
+  height: 40px;
+  width: auto;
+  margin-bottom: 12px;
 }
 
 .footer-tagline {

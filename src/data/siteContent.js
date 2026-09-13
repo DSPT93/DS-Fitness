@@ -4,7 +4,6 @@
 
 export const business = {
   name: "DS Training",
-  shortName: "DS Training",
   trainerName: "Your Name",
   tagline: "Strength, coached with care.",
   location: "Chiswick & Bush Hill Park",

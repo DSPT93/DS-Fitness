@@ -12,6 +12,10 @@ All the placeholder copy — business name, testimonials, prices, prompts — li
 in one file: [`src/data/siteContent.js`](src/data/siteContent.js). Edit that
 file to make the site your own; nothing else needs to change.
 
+The logo is `public/logo.png` (used in the nav and footer) and `public/favicon.png`
+(the browser tab icon). Replace either file with your own artwork, keeping the
+same filename, to swap the branding.
+
 ## How it fits together
 
 - **Frontend**: React (Vite), React Router, Framer Motion for the scroll/entrance animations.

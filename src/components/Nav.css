@@ -29,15 +29,13 @@
 }
 
 .nav-brand {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.2rem;
-  letter-spacing: -0.01em;
-  color: var(--color-charcoal);
+  display: flex;
+  align-items: center;
 }
 
-.nav-menu-open .nav-brand {
-  color: var(--color-cream);
+.nav-brand-logo {
+  height: 34px;
+  width: auto;
 }
 
 .nav-actions {
