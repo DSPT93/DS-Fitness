@@ -38,6 +38,12 @@ export const prompts = [
 export const testimonials = [
   {
     quote:
+      "I used to go the gym regularly, but I found myself doing the same things over and over again, with no real structure. I was getting bored, and more importantly, I wasn't seeing the progress I wanted. David was incredibly quick to identify my strengths and weaknesses and put together a personalised training plan that has delivered amazing results in a very short space of time. What I particularly like is that the plan is constantly evolving as my strength and fitness improve, so I'm always being challenged and making progress. On top of all that, David is such a genuinely nice person to spend time with. I now actually look forward to going to the gym, which I never thought I'd say! I'm loving the results and would highly recommend David to anyone looking for a knowledgeable, motivating and personable personal trainer.",
+    name: "Del S.",
+    context: "In-person client",
+  },
+  {
+    quote:
       "I came in barely able to touch my toes. Six months on I'm deadlifting more than I weigh and my back pain is gone.",
     name: "Sarah M.",
     context: "Client since 2023",
@@ -71,6 +77,22 @@ export const testimonials = [
       "Booking a session and actually getting a plan for the week took ten minutes. It's the easiest part of my routine now.",
     name: "Marcus T.",
     context: "Online coaching client",
+  },
+];
+
+// Short excerpts for the home page's scroll-in testimonial quotes — cut down
+// from the full testimonials above so they read as punchy pull-quotes.
+export const homeQuotes = [
+  {
+    quote:
+      "I came in barely able to touch my toes. Six months on I'm deadlifting more than I weigh and my back pain is gone.",
+    name: "Sarah M.",
+    context: "Client since 2023",
+  },
+  {
+    quote: "I now actually look forward to going to the gym, which I never thought I'd say.",
+    name: "Del S.",
+    context: "In-person client",
   },
 ];
 

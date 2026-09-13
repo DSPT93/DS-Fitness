@@ -40,9 +40,7 @@ export default function About() {
       <section className="section section-alt about-story">
         <div className="container about-story-grid">
           <Reveal className="about-photo" direction="right">
-            <div className="about-photo-placeholder" aria-hidden="true">
-              <span>Photo</span>
-            </div>
+            <img src="/images/david.jpg" alt={business.trainerName} className="about-photo-img" />
           </Reveal>
 
           <Reveal className="about-copy" direction="left" delay={0.1}>

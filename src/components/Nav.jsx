@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { business, navLinks } from "../data/siteContent";
@@ -7,6 +7,7 @@ import "./Nav.css";
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -16,14 +17,25 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    if (!open) return;
+
+    function onPointerDown(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+    }
+    function onKeyDown(e) {
+      if (e.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = "";
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
 
   return (
-    <header className={`nav ${scrolled ? "nav-scrolled" : ""} ${open ? "nav-menu-open" : ""}`}>
+    <header className={`nav ${scrolled ? "nav-scrolled" : ""}`}>
       <div className="nav-inner container">
         <NavLink to="/" className="nav-brand" onClick={() => setOpen(false)}>
           <img src="/logo.png" alt={business.name} className="nav-brand-logo" />
@@ -34,67 +46,60 @@ export default function Nav() {
             Book Free Consultation
           </NavLink>
 
-          <button
-            type="button"
-            className={`nav-burger ${open ? "nav-burger-open" : ""}`}
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            aria-controls="main-menu"
-            onClick={() => setOpen((v) => !v)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+          <div className="nav-menu-wrap" ref={menuRef}>
+            <button
+              type="button"
+              className={`nav-burger ${open ? "nav-burger-open" : ""}`}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              aria-controls="main-menu"
+              onClick={() => setOpen((v) => !v)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+
+            <AnimatePresence>
+              {open && (
+                <motion.div
+                  id="main-menu"
+                  className="nav-dropdown"
+                  initial={{ opacity: 0, scale: 0.94, y: -6 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.94, y: -6 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                >
+                  <nav className="nav-dropdown-links" aria-label="Primary">
+                    {navLinks.map((link) => (
+                      <NavLink
+                        key={link.to}
+                        to={link.to}
+                        end={link.to === "/"}
+                        className={({ isActive }) => `nav-dropdown-link ${isActive ? "nav-dropdown-link-active" : ""}`}
+                        onClick={() => setOpen(false)}
+                      >
+                        {link.label}
+                      </NavLink>
+                    ))}
+                  </nav>
+
+                  <div className="nav-dropdown-footer">
+                    <NavLink to="/booking" className="btn btn-primary nav-dropdown-cta" onClick={() => setOpen(false)}>
+                      Book Free Consultation
+                    </NavLink>
+                    <p className="nav-dropdown-contact">
+                      {business.email}
+                      <br />
+                      {business.phone}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            id="main-menu"
-            className="nav-overlay"
-            initial={{ clipPath: "circle(2% at calc(100% - 44px) 38px)" }}
-            animate={{ clipPath: "circle(150% at calc(100% - 44px) 38px)" }}
-            exit={{ clipPath: "circle(2% at calc(100% - 44px) 38px)" }}
-            transition={{ duration: 0.5, ease: [0.65, 0, 0.35, 1] }}
-          >
-            <nav className="nav-overlay-links" aria-label="Primary">
-              {navLinks.map((link, i) => (
-                <motion.div
-                  key={link.to}
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.12 + i * 0.06, duration: 0.4 }}
-                >
-                  <NavLink
-                    to={link.to}
-                    end={link.to === "/"}
-                    className={({ isActive }) => `nav-overlay-link ${isActive ? "nav-overlay-link-active" : ""}`}
-                    onClick={() => setOpen(false)}
-                  >
-                    {link.label}
-                  </NavLink>
-                </motion.div>
-              ))}
-            </nav>
-
-            <motion.div
-              className="nav-overlay-footer"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.4 }}
-            >
-              <NavLink to="/booking" className="btn btn-primary" onClick={() => setOpen(false)}>
-                Book Free Consultation
-              </NavLink>
-              <p className="nav-overlay-contact">
-                {business.email} · {business.phone}
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 }

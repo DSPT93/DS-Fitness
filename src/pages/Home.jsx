@@ -2,10 +2,8 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Reveal from "../components/Reveal";
-import { business, prompts, testimonials, trainingLocations } from "../data/siteContent";
+import { business, prompts, homeQuotes, trainingLocations } from "../data/siteContent";
 import "./Home.css";
-
-const featuredTestimonials = testimonials.slice(0, 2);
 
 const steps = [
   {
@@ -164,7 +162,7 @@ export default function Home() {
         </div>
 
         <div className="testimonial-stack container">
-          {featuredTestimonials.map((t, i) => (
+          {homeQuotes.map((t, i) => (
             <Reveal
               key={t.name}
               className={`testimonial-block ${i % 2 === 1 ? "testimonial-block-right" : ""}`}
