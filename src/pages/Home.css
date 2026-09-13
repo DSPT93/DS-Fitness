@@ -5,7 +5,7 @@
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(180deg, #fdfaf6 0%, #f5ece1 60%, #efe0cd 100%);
+  background: linear-gradient(180deg, #211d1a 0%, #2a2118 55%, #1a1613 100%);
 }
 
 .hero-glow {
@@ -17,7 +17,7 @@
   max-width: 720px;
   max-height: 720px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(217, 164, 65, 0.35) 0%, rgba(193, 96, 47, 0.18) 45%, rgba(193, 96, 47, 0) 70%);
+  background: radial-gradient(circle, rgba(217, 164, 65, 0.3) 0%, rgba(193, 96, 47, 0.22) 45%, rgba(193, 96, 47, 0) 70%);
   filter: blur(10px);
   pointer-events: none;
 }
@@ -31,16 +31,22 @@
 
 .hero-eyebrow {
   margin-bottom: 20px;
+  color: var(--color-gold);
+}
+
+.hero .hero-eyebrow::before {
+  background: var(--color-gold);
 }
 
 .hero-title {
   font-size: clamp(2.6rem, 6.5vw, 5rem);
   max-width: 16ch;
+  color: var(--color-cream);
 }
 
 .hero-sub {
   font-size: clamp(1.05rem, 2vw, 1.25rem);
-  color: var(--color-ink-soft);
+  color: rgba(253, 250, 246, 0.75);
   max-width: 46ch;
   margin-bottom: 32px;
 }
@@ -49,6 +55,15 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+.hero-actions .btn-ghost {
+  color: var(--color-cream);
+  border-color: var(--color-line-dark);
+}
+
+.hero-actions .btn-ghost:hover {
+  border-color: var(--color-cream);
 }
 
 .hero-scroll-cue {
@@ -60,7 +75,7 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: var(--color-ink-soft);
+  color: rgba(253, 250, 246, 0.6);
 }
 
 .hero-scroll-cue span {
@@ -141,6 +156,46 @@
 .approach-card p {
   color: rgba(253, 250, 246, 0.7);
   margin: 0;
+}
+
+/* Trainer intro */
+
+.trainer-intro-grid {
+  display: grid;
+  gap: 40px;
+  align-items: center;
+  grid-template-columns: 1fr;
+}
+
+.trainer-intro-title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.trainer-intro-copy {
+  color: var(--color-ink-soft);
+  max-width: 46ch;
+  margin-bottom: 24px;
+}
+
+.trainer-intro-photos {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.trainer-photo-placeholder {
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(150deg, var(--color-terracotta) 0%, var(--color-gold) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(253, 250, 246, 0.9);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 16px;
+  box-shadow: var(--shadow-card);
 }
 
 /* Testimonial scroll */
@@ -235,5 +290,9 @@
 @media (min-width: 720px) {
   .approach-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .trainer-intro-grid {
+    grid-template-columns: 1.1fr 0.9fr;
   }
 }

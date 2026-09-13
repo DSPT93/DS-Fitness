@@ -1,4 +1,4 @@
-# DS Fitness — website
+# DS Training — website
 
 A React + Vite site for a personal training business, built to deploy on
 Netlify. It includes:

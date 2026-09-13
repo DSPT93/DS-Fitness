@@ -12,6 +12,9 @@ export const WEEKDAY_LABELS = {
 
 export const CONSULTATION_TYPES = ["in-person", "phone", "video"];
 
+// Keep in sync with `trainingLocations` in src/data/siteContent.js.
+export const TRAINING_LOCATION_IDS = ["chiswick", "bush-hill-park"];
+
 export const DEFAULT_SCHEDULE = {
   slotDurationMinutes: 30,
   horizonDays: 28,

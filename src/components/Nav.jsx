@@ -73,7 +73,6 @@ export default function Nav() {
                     className={({ isActive }) => `nav-overlay-link ${isActive ? "nav-overlay-link-active" : ""}`}
                     onClick={() => setOpen(false)}
                   >
-                    <span className="nav-overlay-link-index">0{i + 1}</span>
                     {link.label}
                   </NavLink>
                 </motion.div>

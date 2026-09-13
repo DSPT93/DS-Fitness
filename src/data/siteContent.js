@@ -3,15 +3,28 @@
 // nothing else in the code needs to change.
 
 export const business = {
-  name: "DS Fitness",
-  shortName: "DS Fitness",
+  name: "DS Training",
+  shortName: "DS Training",
   trainerName: "Your Name",
   tagline: "Strength, coached with care.",
-  location: "Lewisham & South East London",
-  email: "hello@dsfitness.example",
-  phone: "07000 000000",
+  location: "Chiswick & Bush Hill Park",
+  email: "hello@dstraining.example",
+  phone: "07479 256790",
   instagram: "https://instagram.com",
 };
+
+export const trainingLocations = [
+  {
+    id: "chiswick",
+    name: "Chiswick",
+    copy: "In-person sessions in Chiswick.",
+  },
+  {
+    id: "bush-hill-park",
+    name: "Bush Hill Park",
+    copy: "In-person sessions in Bush Hill Park.",
+  },
+];
 
 export const prompts = [
   "Want to feel better in your everyday?",

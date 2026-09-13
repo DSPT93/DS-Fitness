@@ -99,6 +99,17 @@
   box-shadow: var(--shadow-card);
 }
 
+.booking-type-card-active {
+  border-color: var(--color-terracotta);
+  background: var(--color-bg-alt);
+}
+
+.booking-location-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
 .booking-type-icon {
   font-size: 1.8rem;
 }
@@ -290,5 +301,10 @@
 @media (min-width: 640px) {
   .booking-type-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .booking-location-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 560px;
   }
 }

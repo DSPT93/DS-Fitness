@@ -2,10 +2,10 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Reveal from "../components/Reveal";
-import { business, prompts, testimonials } from "../data/siteContent";
+import { business, prompts, testimonials, trainingLocations } from "../data/siteContent";
 import "./Home.css";
 
-const featuredTestimonials = testimonials.slice(0, 4);
+const featuredTestimonials = testimonials.slice(0, 2);
 
 const steps = [
   {
@@ -125,6 +125,31 @@ export default function Home() {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="section trainer-intro">
+        <div className="container trainer-intro-grid">
+          <Reveal direction="right">
+            <p className="eyebrow">Meet your trainer</p>
+            <h2 className="trainer-intro-title">A bit about me</h2>
+            <p className="trainer-intro-copy">
+              Replace this paragraph with your own story — your background, what got you into
+              training, and the way you like to coach. This is the spot to make it personal
+              before someone books a consultation.
+            </p>
+            <Link to="/about" className="btn btn-ghost">
+              Read my full story
+            </Link>
+          </Reveal>
+
+          <Reveal direction="left" delay={0.1} className="trainer-intro-photos">
+            {trainingLocations.map((location) => (
+              <div key={location.id} className="trainer-photo-placeholder" aria-hidden="true">
+                <span>{location.name}</span>
+              </div>
+            ))}
+          </Reveal>
         </div>
       </section>
 

@@ -1,6 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { dataStore, SCHEDULE_KEY, BOOKINGS_KEY } from "./lib/store.js";
-import { normalizeSchedule, isSlotAvailable, CONSULTATION_TYPES } from "./lib/schedule.js";
+import {
+  normalizeSchedule,
+  isSlotAvailable,
+  CONSULTATION_TYPES,
+  TRAINING_LOCATION_IDS,
+} from "./lib/schedule.js";
 import { json, methodNotAllowed } from "./lib/http.js";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -24,6 +29,7 @@ export const handler = async (event) => {
   const date = clean(body.date, 10);
   const time = clean(body.time, 5);
   const type = clean(body.type, 20);
+  const location = clean(body.location, 40);
   const name = clean(body.name, 120);
   const email = clean(body.email, 200);
   const phone = clean(body.phone, 40);
@@ -34,6 +40,9 @@ export const handler = async (event) => {
   }
   if (!CONSULTATION_TYPES.includes(type)) {
     return json(400, { error: "Consultation type must be in-person, phone, or video." });
+  }
+  if (type === "in-person" && !TRAINING_LOCATION_IDS.includes(location)) {
+    return json(400, { error: "Please choose a valid location for an in-person consultation." });
   }
   if (!name) {
     return json(400, { error: "Name is required." });
@@ -59,6 +68,7 @@ export const handler = async (event) => {
     date,
     time,
     type,
+    location: type === "in-person" ? location : "",
     name,
     email,
     phone,

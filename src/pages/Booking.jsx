@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Reveal from "../components/Reveal";
 import { fetchAvailability, submitBooking } from "../lib/api";
-import { business } from "../data/siteContent";
+import { business, trainingLocations } from "../data/siteContent";
 import "./Booking.css";
 
 const CONSULTATION_OPTIONS = [
   {
     id: "in-person",
     title: "In person",
-    copy: `Meet face to face near ${business.location}.`,
+    copy: `Meet face to face in ${trainingLocations.map((l) => l.name).join(" or ")}.`,
     icon: "🤝",
   },
   {
@@ -26,7 +26,19 @@ const CONSULTATION_OPTIONS = [
   },
 ];
 
-const STEP_LABELS = ["Type", "Time", "Your details", "Confirmed"];
+const STEP_LABELS = {
+  type: "Type",
+  location: "Location",
+  calendar: "Time",
+  details: "Your details",
+  confirmed: "Confirmed",
+};
+
+function stepFlow(type) {
+  return type === "in-person"
+    ? ["type", "location", "calendar", "details", "confirmed"]
+    : ["type", "calendar", "details", "confirmed"];
+}
 
 function formatDateLabel(dateStr) {
   const date = new Date(`${dateStr}T00:00:00`);
@@ -52,8 +64,9 @@ function encodeForm(data) {
 }
 
 export default function Booking() {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState("type");
   const [type, setType] = useState(null);
+  const [location, setLocation] = useState(null);
   const [days, setDays] = useState(null);
   const [availabilityError, setAvailabilityError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -63,8 +76,11 @@ export default function Booking() {
   const [submitError, setSubmitError] = useState(null);
   const [confirmedBooking, setConfirmedBooking] = useState(null);
 
+  const flow = stepFlow(type);
+  const stepIndex = Math.max(flow.indexOf(step), 0);
+
   useEffect(() => {
-    if (step !== 1 || days) return;
+    if (step !== "calendar" || days) return;
     let cancelled = false;
     fetchAvailability()
       .then((data) => {
@@ -82,7 +98,12 @@ export default function Booking() {
 
   function selectType(id) {
     setType(id);
-    setStep(1);
+    setStep(id === "in-person" ? "location" : "calendar");
+  }
+
+  function selectLocation(id) {
+    setLocation(id);
+    setStep("calendar");
   }
 
   function selectDate(date) {
@@ -92,7 +113,12 @@ export default function Booking() {
 
   function selectTime(time) {
     setSelectedTime(time);
-    setStep(2);
+    setStep("details");
+  }
+
+  function goBack() {
+    const idx = flow.indexOf(step);
+    if (idx > 0) setStep(flow[idx - 1]);
   }
 
   async function handleSubmit(e) {
@@ -104,6 +130,7 @@ export default function Booking() {
       date: selectedDate,
       time: selectedTime,
       type,
+      location: type === "in-person" ? location : "",
       ...contact,
     };
 
@@ -116,29 +143,15 @@ export default function Booking() {
       fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encodeForm({
-          "form-name": "booking",
-          consultationType: type,
-          date: selectedDate,
-          time: selectedTime,
-          ...contact,
-        }),
+        body: encodeForm({ "form-name": "booking", ...payload }),
       }).catch(() => {});
 
       setConfirmedBooking(booking);
-      setStep(3);
+      setStep("confirmed");
     } catch (err) {
       setSubmitError(err.message);
     } finally {
       setSubmitting(false);
-    }
-  }
-
-  function goBack() {
-    if (step === 1) {
-      setStep(0);
-    } else if (step === 2) {
-      setStep(1);
     }
   }
 
@@ -153,19 +166,19 @@ export default function Booking() {
         </Reveal>
 
         <div className="booking-steps" aria-hidden="true">
-          {STEP_LABELS.map((label, i) => (
-            <div key={label} className={`booking-step ${i <= step ? "booking-step-active" : ""}`}>
+          {flow.map((key, i) => (
+            <div key={key} className={`booking-step ${i <= stepIndex ? "booking-step-active" : ""}`}>
               <span className="booking-step-dot">{i + 1}</span>
-              <span className="booking-step-label">{label}</span>
+              <span className="booking-step-label">{STEP_LABELS[key]}</span>
             </div>
           ))}
         </div>
 
         <div className="booking-panel">
           <AnimatePresence mode="wait">
-            {step === 0 && (
+            {step === "type" && (
               <motion.div
-                key="step-0"
+                key="step-type"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
@@ -191,9 +204,9 @@ export default function Booking() {
               </motion.div>
             )}
 
-            {step === 1 && (
+            {step === "location" && (
               <motion.div
-                key="step-1"
+                key="step-location"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
@@ -201,6 +214,34 @@ export default function Booking() {
               >
                 <button type="button" className="booking-back" onClick={goBack}>
                   ← Change meeting type
+                </button>
+                <h2 className="booking-step-title">Which location suits you?</h2>
+                <div className="booking-location-grid">
+                  {trainingLocations.map((loc) => (
+                    <button
+                      key={loc.id}
+                      type="button"
+                      className={`booking-type-card ${location === loc.id ? "booking-type-card-active" : ""}`}
+                      onClick={() => selectLocation(loc.id)}
+                    >
+                      <span className="booking-type-title">{loc.name}</span>
+                      <span className="booking-type-copy">{loc.copy}</span>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {step === "calendar" && (
+              <motion.div
+                key="step-calendar"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.35 }}
+              >
+                <button type="button" className="booking-back" onClick={goBack}>
+                  ← {type === "in-person" ? "Change location" : "Change meeting type"}
                 </button>
                 <h2 className="booking-step-title">Pick a date &amp; time</h2>
 
@@ -257,9 +298,9 @@ export default function Booking() {
               </motion.div>
             )}
 
-            {step === 2 && (
+            {step === "details" && (
               <motion.div
-                key="step-2"
+                key="step-details"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
@@ -270,8 +311,14 @@ export default function Booking() {
                 </button>
                 <h2 className="booking-step-title">Your details</h2>
                 <p className="booking-summary">
-                  {CONSULTATION_OPTIONS.find((o) => o.id === type)?.title} consultation on{" "}
-                  <strong>{selectedDate && formatDateLabel(selectedDate).full}</strong> at{" "}
+                  {CONSULTATION_OPTIONS.find((o) => o.id === type)?.title} consultation
+                  {type === "in-person" && location && (
+                    <>
+                      {" "}
+                      in <strong>{trainingLocations.find((l) => l.id === location)?.name}</strong>
+                    </>
+                  )}{" "}
+                  on <strong>{selectedDate && formatDateLabel(selectedDate).full}</strong> at{" "}
                   <strong>{selectedTime && formatTimeLabel(selectedTime)}</strong>
                 </p>
 
@@ -320,9 +367,9 @@ export default function Booking() {
               </motion.div>
             )}
 
-            {step === 3 && confirmedBooking && (
+            {step === "confirmed" && confirmedBooking && (
               <motion.div
-                key="step-3"
+                key="step-confirmed"
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
@@ -334,8 +381,17 @@ export default function Booking() {
                 <h2>You're booked in.</h2>
                 <p>
                   Your {CONSULTATION_OPTIONS.find((o) => o.id === confirmedBooking.type)?.title.toLowerCase()}{" "}
-                  consultation is confirmed for{" "}
-                  <strong>{formatDateLabel(confirmedBooking.date).full}</strong> at{" "}
+                  consultation
+                  {confirmedBooking.type === "in-person" && confirmedBooking.location && (
+                    <>
+                      {" "}
+                      in{" "}
+                      <strong>
+                        {trainingLocations.find((l) => l.id === confirmedBooking.location)?.name}
+                      </strong>
+                    </>
+                  )}{" "}
+                  is confirmed for <strong>{formatDateLabel(confirmedBooking.date).full}</strong> at{" "}
                   <strong>{formatTimeLabel(confirmedBooking.time)}</strong>.
                 </p>
                 <p className="booking-confirmed-note">

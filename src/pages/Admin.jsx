@@ -6,7 +6,10 @@ import {
   fetchAdminBookings,
   cancelAdminBooking,
 } from "../lib/api";
+import { trainingLocations } from "../data/siteContent";
 import "./Admin.css";
+
+const LOCATION_NAMES = Object.fromEntries(trainingLocations.map((l) => [l.id, l.name]));
 
 const WEEKDAYS = [
   ["mon", "Monday"],
@@ -225,7 +228,10 @@ function BookingsList() {
                 <strong>{b.date}</strong>
                 <span>{b.time}</span>
               </div>
-              <div className="admin-booking-type">{CONSULTATION_LABELS[b.type] ?? b.type}</div>
+              <div className="admin-booking-type">
+                {CONSULTATION_LABELS[b.type] ?? b.type}
+                {b.location && <span> · {LOCATION_NAMES[b.location] ?? b.location}</span>}
+              </div>
               <div className="admin-booking-contact">
                 <strong>{b.name}</strong>
                 <a href={`mailto:${b.email}`}>{b.email}</a>
