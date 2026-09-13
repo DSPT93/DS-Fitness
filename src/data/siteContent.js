@@ -17,11 +17,13 @@ export const trainingLocations = [
     id: "chiswick",
     name: "Chiswick",
     copy: "In-person sessions in Chiswick.",
+    photo: "/images/chiswick.jpg",
   },
   {
     id: "bush-hill-park",
     name: "Bush Hill Park",
     copy: "In-person sessions in Bush Hill Park.",
+    photo: "/images/bush-hill-park.jpg",
   },
 ];
 

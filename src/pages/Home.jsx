@@ -145,9 +145,10 @@ export default function Home() {
 
           <Reveal direction="left" delay={0.1} className="trainer-intro-photos">
             {trainingLocations.map((location) => (
-              <div key={location.id} className="trainer-photo-placeholder" aria-hidden="true">
-                <span>{location.name}</span>
-              </div>
+              <figure key={location.id} className="trainer-photo">
+                <img src={location.photo} alt={`DS Training's ${location.name} location`} />
+                <figcaption>{location.name}</figcaption>
+              </figure>
             ))}
           </Reveal>
         </div>

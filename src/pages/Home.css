@@ -181,21 +181,28 @@
   display: grid;
   gap: 20px;
   grid-template-columns: repeat(2, 1fr);
+  min-width: 0;
 }
 
-.trainer-photo-placeholder {
+.trainer-photo {
+  min-width: 0;
+  margin: 0;
+}
+
+.trainer-photo img {
+  width: 100%;
   aspect-ratio: 4 / 5;
+  object-fit: cover;
   border-radius: var(--radius-lg);
-  background: linear-gradient(150deg, var(--color-terracotta) 0%, var(--color-gold) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(253, 250, 246, 0.9);
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  text-align: center;
-  padding: 16px;
   box-shadow: var(--shadow-card);
+}
+
+.trainer-photo figcaption {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--color-ink-soft);
+  text-align: center;
 }
 
 /* Testimonial scroll */
