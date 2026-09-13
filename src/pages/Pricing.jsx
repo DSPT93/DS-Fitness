@@ -17,8 +17,8 @@ const faqs = [
     a: "Yes — sessions can be rescheduled with 24 hours' notice, and packages don't expire.",
   },
   {
-    q: "Is online coaching right for me?",
-    a: "If you're self-motivated, have access to a gym or home equipment, and want structured programming without weekly in-person sessions, online coaching is a great fit.",
+    q: "Who is the intro offer for?",
+    a: "Anyone training with me for the first time. It's a low-commitment way to experience personalised coaching before deciding on a bigger package.",
   },
 ];
 
@@ -69,12 +69,6 @@ export default function Pricing() {
             </Reveal>
           ))}
         </div>
-        <Reveal className="container pricing-note" delay={0.2}>
-          <p>
-            Prices shown are placeholders — update them in <code>src/data/siteContent.js</code>{" "}
-            once you've settled on your own rates.
-          </p>
-        </Reveal>
       </section>
 
       <section className="section pricing-faq">
