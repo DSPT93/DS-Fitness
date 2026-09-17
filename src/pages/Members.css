@@ -1,0 +1,262 @@
+.members-page {
+  min-height: 70vh;
+}
+
+.members-login {
+  max-width: 520px;
+}
+
+.members-login h1 {
+  font-size: clamp(1.9rem, 4vw, 2.4rem);
+  margin-bottom: 12px;
+}
+
+.members-login .members-muted {
+  margin-bottom: 24px;
+}
+
+.members-login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.members-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+}
+
+.members-header h1 {
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  margin: 4px 0 0;
+}
+
+.members-muted {
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+}
+
+.members-error {
+  color: #a3311a;
+  background: #fbe7e0;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+.members-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+  margin-bottom: 20px;
+}
+
+.members-panel {
+  background: var(--color-cream);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  padding: clamp(20px, 4vw, 32px);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 20px;
+}
+
+.members-panel-title {
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+
+.members-checkin {
+  background: var(--color-charcoal);
+  border-color: var(--color-charcoal);
+}
+
+.members-checkin .members-panel-title,
+.checkin-date {
+  color: var(--color-cream);
+}
+
+.members-checkin .members-muted {
+  color: rgba(253, 250, 246, 0.7);
+}
+
+.checkin-date {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.plan-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  margin: 0 0 2px;
+}
+
+.plan-date {
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
+.plan-notes {
+  color: var(--color-ink-soft);
+  font-size: 0.9rem;
+  margin: 0 0 16px;
+}
+
+.plan-exercises {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-exercise-row {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-alt);
+}
+
+.plan-exercise-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.plan-exercise-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+.plan-exercise-notes {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.history-item-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-bg);
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.history-item-date {
+  color: var(--color-ink-soft);
+  font-weight: 400;
+}
+
+.history-item-chevron {
+  color: var(--color-terracotta);
+  font-weight: 700;
+}
+
+.history-item-body {
+  padding: 16px;
+  border-top: 1px solid var(--color-line);
+}
+
+.glossary-search {
+  width: 100%;
+  max-width: 320px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line);
+  background: var(--color-bg);
+  font-size: 0.95rem;
+}
+
+.glossary-search:focus {
+  outline: none;
+  border-color: var(--color-terracotta);
+}
+
+.glossary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.glossary-entry {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+}
+
+.glossary-entry summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.glossary-entry summary::-webkit-details-marker {
+  display: none;
+}
+
+.glossary-entry summary::before {
+  content: "+";
+  color: var(--color-terracotta);
+  font-weight: 700;
+}
+
+.glossary-entry[open] summary::before {
+  content: "−";
+}
+
+.glossary-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-terracotta-deep);
+  background: var(--color-bg-alt);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.glossary-entry p {
+  margin: 10px 0 0;
+  color: var(--color-ink-soft);
+  font-size: 0.9rem;
+}
+
+.glossary-entry a {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--color-terracotta-deep);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+@media (min-width: 900px) {
+  .members-grid {
+    grid-template-columns: 1fr 1.6fr;
+  }
+}

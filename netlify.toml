@@ -28,6 +28,31 @@
   to = "/.netlify/functions/book"
   status = 200
 
+[[redirects]]
+  from = "/api/member/me"
+  to = "/.netlify/functions/member-me"
+  status = 200
+
+[[redirects]]
+  from = "/api/member/glossary"
+  to = "/.netlify/functions/member-glossary"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/members"
+  to = "/.netlify/functions/admin-members"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/plans"
+  to = "/.netlify/functions/admin-plans"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/glossary"
+  to = "/.netlify/functions/admin-glossary"
+  status = 200
+
 # Single-page app fallback so client-side routes (e.g. /about, /booking)
 # resolve correctly on a hard refresh or direct link.
 [[redirects]]

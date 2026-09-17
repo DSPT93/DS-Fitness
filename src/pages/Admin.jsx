@@ -1,10 +1,22 @@
 import { useEffect, useState } from "react";
-import identity, { initIdentity, openLogin, logout } from "../lib/identity";
+import { openLogin, logout } from "../lib/identity";
+import { useIdentityUser } from "../lib/useIdentityUser";
 import {
   fetchAdminSchedule,
   saveAdminSchedule,
   fetchAdminBookings,
   cancelAdminBooking,
+  fetchAdminMembers,
+  inviteAdminMember,
+  updateAdminMember,
+  removeAdminMember,
+  fetchAdminPlans,
+  createAdminPlan,
+  deleteAdminPlan,
+  fetchAdminGlossary,
+  createAdminGlossaryEntry,
+  updateAdminGlossaryEntry,
+  deleteAdminGlossaryEntry,
 } from "../lib/api";
 import { trainingLocations } from "../data/siteContent";
 import "./Admin.css";
@@ -254,38 +266,444 @@ function BookingsList() {
   );
 }
 
+const EMPTY_EXERCISE = { name: "", sets: "", reps: "", rest: "", notes: "" };
+
+function MemberPlans({ userId, memberName, onBack }) {
+  const [plans, setPlans] = useState(null);
+  const [error, setError] = useState(null);
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
+  const [exercises, setExercises] = useState([{ ...EMPTY_EXERCISE }]);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
+  function load() {
+    fetchAdminPlans(userId)
+      .then((data) => setPlans(data.plans))
+      .catch((err) => setError(err.message));
+  }
+
+  useEffect(load, [userId]);
+
+  function updateExercise(idx, field, value) {
+    setExercises((rows) => rows.map((r, i) => (i === idx ? { ...r, [field]: value } : r)));
+  }
+
+  function addExerciseRow() {
+    setExercises((rows) => [...rows, { ...EMPTY_EXERCISE }]);
+  }
+
+  function removeExerciseRow(idx) {
+    setExercises((rows) => rows.filter((_, i) => i !== idx));
+  }
+
+  async function handleCreate(e) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      await createAdminPlan(userId, { title, notes, exercises });
+      setTitle("");
+      setNotes("");
+      setExercises([{ ...EMPTY_EXERCISE }]);
+      load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(planId) {
+    setDeletingId(planId);
+    try {
+      await deleteAdminPlan(userId, planId);
+      setPlans((p) => p.filter((plan) => plan.id !== planId));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  const sorted = plans ? [...plans].reverse() : null;
+
+  return (
+    <div className="admin-panel">
+      <button type="button" className="admin-back" onClick={onBack}>
+        ← Back to members
+      </button>
+      <div className="admin-panel-header">
+        <h2>{memberName}'s plans</h2>
+        <p className="admin-muted">The most recent plan is what they see as their "latest plan".</p>
+      </div>
+
+      {error && <p className="admin-error">{error}</p>}
+
+      <form className="admin-plan-form" onSubmit={handleCreate}>
+        <h3>New plan</h3>
+        <label className="admin-field">
+          <span>Title</span>
+          <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} />
+        </label>
+        <label className="admin-field">
+          <span>Notes (optional)</span>
+          <textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        </label>
+
+        <div className="admin-exercise-rows">
+          {exercises.map((ex, idx) => (
+            <div key={idx} className="admin-exercise-row">
+              <input
+                type="text"
+                placeholder="Exercise name"
+                value={ex.name}
+                onChange={(e) => updateExercise(idx, "name", e.target.value)}
+                className="admin-exercise-name"
+              />
+              <input
+                type="text"
+                placeholder="Sets"
+                value={ex.sets}
+                onChange={(e) => updateExercise(idx, "sets", e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Reps"
+                value={ex.reps}
+                onChange={(e) => updateExercise(idx, "reps", e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Rest"
+                value={ex.rest}
+                onChange={(e) => updateExercise(idx, "rest", e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Notes"
+                value={ex.notes}
+                onChange={(e) => updateExercise(idx, "notes", e.target.value)}
+                className="admin-exercise-notes"
+              />
+              <button
+                type="button"
+                className="admin-icon-btn"
+                onClick={() => removeExerciseRow(idx)}
+                disabled={exercises.length === 1}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button type="button" className="admin-add-range" onClick={addExerciseRow}>
+          + Add exercise
+        </button>
+
+        <button type="submit" className="btn btn-primary admin-plan-save" disabled={saving}>
+          {saving ? "Saving…" : "Save plan"}
+        </button>
+      </form>
+
+      <h3 className="admin-plan-history-title">Plan history</h3>
+      {!sorted && <p className="admin-muted">Loading…</p>}
+      {sorted && sorted.length === 0 && <p className="admin-muted">No plans yet.</p>}
+      {sorted && sorted.length > 0 && (
+        <div className="admin-plan-history">
+          {sorted.map((plan, i) => (
+            <div key={plan.id} className="admin-plan-history-item">
+              <div>
+                <strong>{plan.title}</strong>
+                {i === 0 && <span className="admin-plan-current-badge">Current</span>}
+                <span className="admin-plan-history-date">
+                  {" "}
+                  · {new Date(plan.createdAt).toLocaleDateString()} · {plan.exercises.length} exercises
+                </span>
+              </div>
+              <button
+                type="button"
+                className="admin-icon-btn"
+                onClick={() => handleDelete(plan.id)}
+                disabled={deletingId === plan.id}
+              >
+                {deletingId === plan.id ? "Removing…" : "Remove"}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MembersManager() {
+  const [members, setMembers] = useState(null);
+  const [error, setError] = useState(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [selected, setSelected] = useState(null);
+
+  function load() {
+    fetchAdminMembers()
+      .then((data) => setMembers(data.members))
+      .catch((err) => setError(err.message));
+  }
+
+  useEffect(load, []);
+
+  async function handleInvite(e) {
+    e.preventDefault();
+    setInviting(true);
+    setError(null);
+    try {
+      await inviteAdminMember({ name, email });
+      setName("");
+      setEmail("");
+      load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setInviting(false);
+    }
+  }
+
+  async function handleCheckin(userId, nextCheckIn) {
+    try {
+      await updateAdminMember({ userId, nextCheckIn });
+      setMembers((list) => list.map((m) => (m.userId === userId ? { ...m, nextCheckIn } : m)));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function handleRemove(userId, memberName) {
+    if (!window.confirm(`Remove ${memberName}? They'll lose access and their plans will be deleted.`)) return;
+    try {
+      await removeAdminMember(userId);
+      setMembers((list) => list.filter((m) => m.userId !== userId));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  if (selected) {
+    return (
+      <MemberPlans userId={selected.userId} memberName={selected.name} onBack={() => setSelected(null)} />
+    );
+  }
+
+  return (
+    <div className="admin-panel">
+      <div className="admin-panel-header">
+        <h2>Members</h2>
+        <p className="admin-muted">
+          Invite paying clients here — they'll get an email to set a password, then can sign in at{" "}
+          <code>/members</code> to see their plans.
+        </p>
+      </div>
+
+      <form className="admin-invite-form" onSubmit={handleInvite}>
+        <input type="text" placeholder="Full name" required value={name} onChange={(e) => setName(e.target.value)} />
+        <input
+          type="email"
+          placeholder="Email address"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <button type="submit" className="btn btn-primary" disabled={inviting}>
+          {inviting ? "Inviting…" : "Invite member"}
+        </button>
+      </form>
+
+      {error && <p className="admin-error">{error}</p>}
+      {!members && !error && <p className="admin-muted">Loading members…</p>}
+      {members && members.length === 0 && <p className="admin-muted">No members yet.</p>}
+
+      {members && members.length > 0 && (
+        <div className="admin-members-table">
+          {members.map((m) => (
+            <div key={m.userId} className="admin-member-row">
+              <div className="admin-member-info">
+                <strong>{m.name}</strong>
+                <a href={`mailto:${m.email}`}>{m.email}</a>
+                <span className="admin-muted">
+                  {m.planCount} plan{m.planCount === 1 ? "" : "s"}
+                  {m.latestPlanTitle ? ` · Latest: ${m.latestPlanTitle}` : ""}
+                </span>
+              </div>
+              <label className="admin-member-checkin">
+                <span>Next catch-up</span>
+                <input
+                  type="date"
+                  value={m.nextCheckIn ?? ""}
+                  onChange={(e) => handleCheckin(m.userId, e.target.value)}
+                />
+              </label>
+              <div className="admin-member-actions">
+                <button type="button" className="btn btn-ghost" onClick={() => setSelected(m)}>
+                  Manage plans
+                </button>
+                <button type="button" className="admin-icon-btn" onClick={() => handleRemove(m.userId, m.name)}>
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const EMPTY_GLOSSARY_ENTRY = { name: "", category: "", instructions: "", videoUrl: "" };
+
+function GlossaryManager() {
+  const [entries, setEntries] = useState(null);
+  const [error, setError] = useState(null);
+  const [form, setForm] = useState(EMPTY_GLOSSARY_ENTRY);
+  const [editingId, setEditingId] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  function load() {
+    fetchAdminGlossary()
+      .then((data) => setEntries(data.glossary))
+      .catch((err) => setError(err.message));
+  }
+
+  useEffect(load, []);
+
+  function startEdit(entry) {
+    setEditingId(entry.id);
+    setForm({ name: entry.name, category: entry.category, instructions: entry.instructions, videoUrl: entry.videoUrl });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setForm(EMPTY_GLOSSARY_ENTRY);
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      if (editingId) {
+        await updateAdminGlossaryEntry({ id: editingId, ...form });
+      } else {
+        await createAdminGlossaryEntry(form);
+      }
+      cancelEdit();
+      load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm("Remove this exercise from the glossary?")) return;
+    try {
+      await deleteAdminGlossaryEntry(id);
+      setEntries((list) => list.filter((e) => e.id !== id));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  return (
+    <div className="admin-panel">
+      <div className="admin-panel-header">
+        <h2>Exercise glossary</h2>
+        <p className="admin-muted">Shared across all members — add instructions once, reuse them in any plan.</p>
+      </div>
+
+      <form className="admin-plan-form" onSubmit={handleSubmit}>
+        <h3>{editingId ? "Edit exercise" : "New exercise"}</h3>
+        <label className="admin-field">
+          <span>Name</span>
+          <input
+            type="text"
+            required
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+        </label>
+        <label className="admin-field">
+          <span>Category (optional)</span>
+          <input
+            type="text"
+            placeholder="e.g. Legs, Upper body, Core"
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+          />
+        </label>
+        <label className="admin-field">
+          <span>Instructions</span>
+          <textarea
+            rows={4}
+            required
+            value={form.instructions}
+            onChange={(e) => setForm({ ...form, instructions: e.target.value })}
+          />
+        </label>
+        <label className="admin-field">
+          <span>Video URL (optional)</span>
+          <input
+            type="url"
+            placeholder="https://…"
+            value={form.videoUrl}
+            onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+          />
+        </label>
+
+        {error && <p className="admin-error">{error}</p>}
+
+        <div className="admin-form-actions">
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Saving…" : editingId ? "Save changes" : "Add exercise"}
+          </button>
+          {editingId && (
+            <button type="button" className="btn btn-ghost" onClick={cancelEdit}>
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
+
+      {!entries && !error && <p className="admin-muted">Loading…</p>}
+      {entries && entries.length === 0 && <p className="admin-muted">No exercises yet.</p>}
+
+      {entries && entries.length > 0 && (
+        <div className="admin-glossary-list">
+          {entries.map((entry) => (
+            <div key={entry.id} className="admin-glossary-row">
+              <div>
+                <strong>{entry.name}</strong>
+                {entry.category && <span className="glossary-tag">{entry.category}</span>}
+              </div>
+              <div className="admin-member-actions">
+                <button type="button" className="btn btn-ghost" onClick={() => startEdit(entry)}>
+                  Edit
+                </button>
+                <button type="button" className="admin-icon-btn" onClick={() => handleDelete(entry.id)}>
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Admin() {
-  const [user, setUser] = useState(undefined);
+  const user = useIdentityUser();
   const [tab, setTab] = useState("bookings");
-
-  useEffect(() => {
-    const onInit = (u) => setUser(u ?? null);
-    const onLogin = (u) => {
-      setUser(u);
-      identity.close();
-    };
-    const onLogout = () => setUser(null);
-
-    identity.on("init", onInit);
-    identity.on("login", onLogin);
-    identity.on("logout", onLogout);
-    initIdentity();
-
-    // The widget's `init` event depends on reaching this site's Identity
-    // endpoint. If that's slow, unreachable, or Identity isn't enabled yet,
-    // fall back to whatever the widget already knows rather than leaving
-    // the page stuck on "Loading..." forever.
-    const fallback = setTimeout(() => {
-      setUser((current) => (current === undefined ? identity.currentUser() ?? null : current));
-    }, 2000);
-
-    return () => {
-      clearTimeout(fallback);
-      identity.off("init", onInit);
-      identity.off("login", onLogin);
-      identity.off("logout", onLogout);
-    };
-  }, []);
 
   if (user === undefined) {
     return (
@@ -309,6 +727,24 @@ export default function Admin() {
           </p>
           <button type="button" className="btn btn-primary" onClick={openLogin}>
             Sign in
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  if (!user.app_metadata?.roles?.includes("admin")) {
+    return (
+      <section className="section admin-page">
+        <div className="container admin-login">
+          <p className="eyebrow">Admin</p>
+          <h1>This account isn't an admin</h1>
+          <p className="admin-muted">
+            You're signed in, but this account doesn't have admin access. If you're a member
+            looking for your workouts, head to the <a href="/members">members area</a> instead.
+          </p>
+          <button type="button" className="btn btn-ghost" onClick={logout}>
+            Sign out
           </button>
         </div>
       </section>
@@ -343,9 +779,26 @@ export default function Admin() {
           >
             Availability
           </button>
+          <button
+            type="button"
+            className={`admin-tab ${tab === "members" ? "admin-tab-active" : ""}`}
+            onClick={() => setTab("members")}
+          >
+            Members
+          </button>
+          <button
+            type="button"
+            className={`admin-tab ${tab === "glossary" ? "admin-tab-active" : ""}`}
+            onClick={() => setTab("glossary")}
+          >
+            Glossary
+          </button>
         </div>
 
-        {tab === "bookings" ? <BookingsList /> : <ScheduleEditor />}
+        {tab === "bookings" && <BookingsList />}
+        {tab === "schedule" && <ScheduleEditor />}
+        {tab === "members" && <MembersManager />}
+        {tab === "glossary" && <GlossaryManager />}
       </div>
     </section>
   );

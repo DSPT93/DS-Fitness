@@ -1,14 +1,36 @@
-// Any confirmed Netlify Identity user is treated as an admin. This site is
-// built for a single trainer, so access should be controlled by keeping
-// Identity registration invite-only (see README), not by a roles system.
+// Two audiences now share Netlify Identity: the trainer (role "admin") and
+// paying clients (role "member"). Registration stays invite-only (see
+// README) — anyone with an account got there because the admin invited them
+// — but access to admin-only and member-only data is still gated by role,
+// not just "is signed in".
 export function getIdentityUser(context) {
   return context?.clientContext?.user ?? null;
+}
+
+function hasRole(user, role) {
+  return Boolean(user?.app_metadata?.roles?.includes(role));
 }
 
 export function requireAdmin(context) {
   const user = getIdentityUser(context);
   if (!user) {
     return { ok: false, response: { statusCode: 401, body: "Unauthorized" } };
+  }
+  if (!hasRole(user, "admin")) {
+    return { ok: false, response: { statusCode: 403, body: "Forbidden" } };
+  }
+  return { ok: true, user };
+}
+
+// Member-only endpoints also accept the admin, so the trainer can see
+// exactly what a client sees when troubleshooting.
+export function requireMember(context) {
+  const user = getIdentityUser(context);
+  if (!user) {
+    return { ok: false, response: { statusCode: 401, body: "Unauthorized" } };
+  }
+  if (!hasRole(user, "member") && !hasRole(user, "admin")) {
+    return { ok: false, response: { statusCode: 403, body: "Forbidden" } };
   }
   return { ok: true, user };
 }

@@ -163,4 +163,5 @@ export const navLinks = [
   { to: "/pricing", label: "Pricing" },
   { to: "/testimonials", label: "Testimonials" },
   { to: "/booking", label: "Bookings" },
+  { to: "/members", label: "Members" },
 ];

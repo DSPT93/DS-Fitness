@@ -267,6 +267,211 @@
   margin: 6px 0 0;
 }
 
+.admin-back {
+  background: none;
+  border: none;
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.admin-back:hover {
+  color: var(--color-terracotta-deep);
+}
+
+.admin-invite-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.admin-invite-form input {
+  flex: 1 1 200px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line);
+  background: var(--color-bg);
+  font-size: 0.9rem;
+}
+
+.admin-members-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-member-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.admin-member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.9rem;
+}
+
+.admin-member-info a {
+  color: var(--color-terracotta-deep);
+}
+
+.admin-member-checkin {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--color-ink-soft);
+}
+
+.admin-member-checkin input {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line);
+  background: var(--color-bg);
+  font-size: 0.85rem;
+}
+
+.admin-member-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-plan-form {
+  padding: 20px;
+  margin-bottom: 28px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-alt);
+}
+
+.admin-plan-form h3 {
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+.admin-field input,
+.admin-field textarea {
+  font-family: inherit;
+  font-size: 0.92rem;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line);
+  background: var(--color-bg);
+  resize: vertical;
+}
+
+.admin-exercise-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.admin-exercise-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr 0.6fr 0.6fr 1.2fr auto;
+  gap: 8px;
+}
+
+.admin-exercise-row input {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line);
+  background: var(--color-bg);
+  font-size: 0.85rem;
+}
+
+.admin-plan-save {
+  margin-top: 16px;
+}
+
+.admin-form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.admin-plan-history-title {
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+.admin-plan-history {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-plan-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 0.9rem;
+}
+
+.admin-plan-current-badge {
+  margin-left: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-cream);
+  background: var(--color-terracotta);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.admin-plan-history-date {
+  color: var(--color-ink-soft);
+}
+
+.admin-glossary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-glossary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.glossary-tag {
+  margin-left: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-terracotta-deep);
+  background: var(--color-bg-alt);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
 @media (max-width: 640px) {
   .admin-day-row {
     grid-template-columns: 1fr;
@@ -274,5 +479,14 @@
 
   .admin-booking-row {
     grid-template-columns: 1fr;
+  }
+
+  .admin-member-row {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .admin-exercise-row {
+    grid-template-columns: 1fr 1fr;
   }
 }

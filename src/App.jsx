@@ -7,6 +7,7 @@ import About from "./pages/About";
 import Pricing from "./pages/Pricing";
 import Testimonials from "./pages/Testimonials";
 import Booking from "./pages/Booking";
+import Members from "./pages/Members";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/booking" element={<Booking />} />
+          <Route path="/members" element={<Members />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

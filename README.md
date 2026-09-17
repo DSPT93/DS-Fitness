@@ -7,6 +7,9 @@ Netlify. It includes:
 - About, Pricing and Testimonials pages
 - A free-consultation booking flow (in person / phone / video → calendar → contact details)
 - An admin area (Netlify Identity login) to set weekly availability and manage bookings
+- A paywalled **members area** — the trainer invites paying clients, who then
+  sign in to see their latest workout plan, plan history, next catch-up date,
+  and a shared exercise glossary
 
 All the placeholder copy — business name, testimonials, prices, prompts — lives
 in one file: [`src/data/siteContent.js`](src/data/siteContent.js). Edit that
@@ -20,7 +23,9 @@ same filename, to swap the branding.
 
 - **Frontend**: React (Vite), React Router, Framer Motion for the scroll/entrance animations.
 - **Booking data & availability**: stored in [Netlify Blobs](https://docs.netlify.com/blobs/overview/) (`ds-fitness` store), read/written by serverless functions in `netlify/functions/`.
-- **Admin auth**: [Netlify Identity](https://docs.netlify.com/visitor-access/identity/) — any confirmed Identity user can access `/admin`. Since this is a single-trainer site, access is controlled by keeping registration invite-only (see below), not by a roles system.
+- **Auth & roles**: [Netlify Identity](https://docs.netlify.com/visitor-access/identity/), invite-only (no public sign-up). Two roles share the same Identity instance: **`admin`** (the trainer — full access to `/admin`) and **`member`** (a paying client — access to `/members` only). Roles live in each user's Identity `app_metadata.roles` and are checked on both the client (to show the right UI) and in every serverless function (`requireAdmin`/`requireMember` in `netlify/functions/lib/auth.js`) — the client-side check is only for UX, the function-side check is what actually protects the data.
+- **Members data**: each member's profile (name, email, next catch-up date) and workout plans are stored in Netlify Blobs, keyed by their Identity user id. Workout "history" is just every plan ever created for that member — the most recent one is their "latest plan". The exercise glossary is one shared list, editable from `/admin`, visible to any signed-in member.
+- **No payment processing is wired up.** "Paying for access" is handled by you outside the site (bank transfer, invoice, cash, whatever you already use for packages) — once someone's paid, you invite them from the **Members** tab in `/admin`, which creates their account and grants portal access. If you later want automated recurring billing (e.g. Stripe Checkout + webhooks to grant/revoke the `member` role), that's a separate integration this repo doesn't include yet.
 - **Booking notifications**: bookings are always saved to Netlify Blobs (so nothing is ever lost even if email fails). The booking form also mirrors each submission to a [Netlify Forms](https://docs.netlify.com/forms/setup/) submission named `booking`, so you can turn on an email notification for new bookings from the Netlify UI with no extra code.
 
 ## Local development
@@ -54,8 +59,13 @@ netlify dev
    - Under **Site configuration → Identity → Emails**, you can customise the
      invitation email.
    - Invite yourself: Identity tab → **Invite users** → enter your email.
-     You'll get an email to set a password, then you can sign in at
-     `/admin` on the live site.
+     You'll get an email to set a password.
+   - **Give yourself the admin role**: still on the Identity tab, click your
+     own user, and add `admin` under **Roles**. This one manual step is
+     required — without it, your account can sign in but `/admin` will say
+     it isn't an admin account. You only need to do this once, for yourself;
+     clients you invite from the Members tab get the `member` role
+     automatically.
 3. **Enable form notifications** (optional but recommended): once the site
    has deployed at least once (so Netlify has scanned `index.html` and found
    the hidden `booking` form), go to **Site configuration → Forms → Form
@@ -75,6 +85,28 @@ Sign in at `/admin` (bottom of any page footer, or navigate directly) and:
 - Use the **Bookings** tab to see everything that's been booked and cancel
   a booking if needed (this frees the slot back up for other clients).
 
+### Managing members
+
+Once a client has paid you (outside the site) for digital coaching:
+
+1. Go to `/admin` → **Members** → enter their name and email → **Invite
+   member**. This creates their Identity account (with the `member` role)
+   and sends them an email to set a password — same flow as your own admin
+   invite.
+2. Click **Manage plans** next to their name to write their first workout
+   plan (a title, optional notes, and a list of exercises with sets/reps/
+   rest/notes). Every plan you add becomes their new "latest plan"; older
+   ones automatically become their visible plan history.
+3. Set their **next catch-up** date directly from the members table — it
+   shows up on their dashboard immediately.
+4. Use **Remove** to fully offboard a client: it deletes their Identity
+   account and their plans.
+
+The **Glossary** tab manages one shared list of exercises (name, category,
+instructions, optional video link) that every member can browse and search
+from their dashboard — write an exercise's instructions once, reuse it
+across as many plans as you like.
+
 ### A note on scale
 
 Blobs are read and updated with a simple read-modify-write per request,
@@ -90,12 +122,17 @@ src/
   components/       Nav, Footer, Reveal (scroll-in-view animation helper)
   data/siteContent.js   All editable copy: business info, testimonials, prompts, pricing
   lib/              Netlify Identity + fetch helpers for the serverless functions
-  pages/            Home, About, Pricing, Testimonials, Booking, Admin
+  pages/            Home, About, Pricing, Testimonials, Booking, Members, Admin
 netlify/functions/
   availability.js       GET  — public, computes bookable slots
   book.js               POST — public, creates a booking
-  admin-schedule.js     GET/PUT — Identity-protected, reads/writes weekly availability
-  admin-bookings.js     GET/DELETE — Identity-protected, lists/cancels bookings
-  lib/                  Shared schedule math, storage and auth helpers
+  admin-schedule.js     GET/PUT — admin-only, reads/writes weekly availability
+  admin-bookings.js     GET/DELETE — admin-only, lists/cancels bookings
+  admin-members.js      GET/POST/PUT/DELETE — admin-only, invite/list/update/remove members
+  admin-plans.js        GET/POST/DELETE — admin-only, a member's workout plans
+  admin-glossary.js     GET/POST/PUT/DELETE — admin-only, the shared exercise glossary
+  member-me.js          GET — member-only, the signed-in member's own profile + plans
+  member-glossary.js    GET — member-only, the shared exercise glossary
+  lib/                  Shared schedule/member data helpers, storage, and role-based auth
 netlify.toml        Build settings, API redirects, SPA fallback
 ```
