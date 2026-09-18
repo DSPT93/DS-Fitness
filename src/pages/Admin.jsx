@@ -444,6 +444,7 @@ function MembersManager() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [inviting, setInviting] = useState(false);
+  const [invited, setInvited] = useState(null);
   const [selected, setSelected] = useState(null);
 
   function load() {
@@ -458,8 +459,10 @@ function MembersManager() {
     e.preventDefault();
     setInviting(true);
     setError(null);
+    setInvited(null);
     try {
       await inviteAdminMember({ name, email });
+      setInvited(`${name} <${email}>`);
       setName("");
       setEmail("");
       load();
@@ -520,6 +523,7 @@ function MembersManager() {
       </form>
 
       {error && <p className="admin-error">{error}</p>}
+      {invited && <p className="admin-success">Invited {invited} — they'll get an email shortly.</p>}
       {!members && !error && <p className="admin-muted">Loading members…</p>}
       {members && members.length === 0 && <p className="admin-muted">No members yet.</p>}
 

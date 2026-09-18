@@ -31,18 +31,24 @@ async function identityFetch(context, path, options = {}) {
   return contentType.includes("application/json") ? res.json() : null;
 }
 
-// Creating a user via the admin API sends the same invite email as the
-// "Invite users" button in the Netlify dashboard.
+// POST /admin/users (the endpoint we used to call here) only ever creates a
+// user record — it never sends an email, regardless of what's in the body.
+// The endpoint that actually sends the invite email (matching the "Invite
+// users" button in the Netlify dashboard) is POST /invite, but it only
+// accepts `email` and `data` (-> user_metadata) — no app_metadata/roles —
+// so the member role has to be set in a second call once the user exists.
 export async function inviteMember(context, { email, name }) {
-  const data = await identityFetch(context, "/admin/users", {
+  const user = await identityFetch(context, "/invite", {
     method: "POST",
-    body: JSON.stringify({
-      email,
-      user_metadata: { full_name: name },
-      app_metadata: { roles: ["member"] },
-    }),
+    body: JSON.stringify({ email, data: { full_name: name } }),
   });
-  return data;
+
+  await identityFetch(context, `/admin/users/${user.id}`, {
+    method: "POST",
+    body: JSON.stringify({ app_metadata: { roles: ["member"] } }),
+  });
+
+  return user;
 }
 
 export async function deleteIdentityUser(context, userId) {
