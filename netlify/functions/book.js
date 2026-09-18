@@ -51,7 +51,7 @@ export const handler = withErrorHandling(async (event) => {
     return json(400, { error: "A valid email address is required." });
   }
 
-  const store = dataStore();
+  const store = dataStore(event);
   const [rawSchedule, bookings] = await Promise.all([
     store.get(SCHEDULE_KEY, { type: "json" }),
     store.get(BOOKINGS_KEY, { type: "json" }),

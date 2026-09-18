@@ -8,7 +8,7 @@ export const handler = withErrorHandling(async (event, context) => {
   const auth = requireMember(context);
   if (!auth.ok) return auth.response;
 
-  const store = dataStore();
+  const store = dataStore(event);
   const [members, plans] = await Promise.all([
     store.get(MEMBERS_KEY, { type: "json" }),
     store.get(plansKey(auth.user.sub), { type: "json" }),

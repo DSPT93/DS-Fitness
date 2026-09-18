@@ -1,8 +1,15 @@
-import { getStore } from "@netlify/blobs";
+import { connectLambda, getStore } from "@netlify/blobs";
 
 const STORE_NAME = "ds-fitness";
 
-export function dataStore() {
+// Our functions use the classic `handler = async (event, context) => {}`
+// signature ("Lambda compatibility mode"). Netlify Blobs only auto-detects
+// its environment (siteID/token) for the newer function styles — in Lambda
+// compatibility mode it must be told about the current request explicitly
+// via connectLambda(), or every getStore() call fails with
+// MissingBlobsEnvironmentError. See https://github.com/netlify/blobs#lambda-compatibility-mode
+export function dataStore(event) {
+  connectLambda(event);
   return getStore(STORE_NAME);
 }
 

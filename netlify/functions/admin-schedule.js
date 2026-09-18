@@ -7,7 +7,7 @@ export const handler = withErrorHandling(async (event, context) => {
   const auth = requireAdmin(context);
   if (!auth.ok) return auth.response;
 
-  const store = dataStore();
+  const store = dataStore(event);
 
   if (event.httpMethod === "GET") {
     const raw = await store.get(SCHEDULE_KEY, { type: "json" });

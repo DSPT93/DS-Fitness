@@ -5,7 +5,7 @@ import { json, methodNotAllowed, withErrorHandling } from "./lib/http.js";
 export const handler = withErrorHandling(async (event) => {
   if (event.httpMethod !== "GET") return methodNotAllowed(["GET"]);
 
-  const store = dataStore();
+  const store = dataStore(event);
   const [rawSchedule, bookings] = await Promise.all([
     store.get(SCHEDULE_KEY, { type: "json" }),
     store.get(BOOKINGS_KEY, { type: "json" }),

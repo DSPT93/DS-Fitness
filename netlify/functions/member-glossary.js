@@ -8,7 +8,7 @@ export const handler = withErrorHandling(async (event, context) => {
   const auth = requireMember(context);
   if (!auth.ok) return auth.response;
 
-  const store = dataStore();
+  const store = dataStore(event);
   const glossary = (await store.get(GLOSSARY_KEY, { type: "json" })) ?? [];
 
   return json(200, { glossary });
