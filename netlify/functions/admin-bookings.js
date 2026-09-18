@@ -1,8 +1,8 @@
 import { dataStore, BOOKINGS_KEY } from "./lib/store.js";
 import { requireAdmin } from "./lib/auth.js";
-import { json, methodNotAllowed } from "./lib/http.js";
+import { json, methodNotAllowed, withErrorHandling } from "./lib/http.js";
 
-export const handler = async (event, context) => {
+export const handler = withErrorHandling(async (event, context) => {
   const auth = requireAdmin(context);
   if (!auth.ok) return auth.response;
 
@@ -27,4 +27,4 @@ export const handler = async (event, context) => {
   }
 
   return methodNotAllowed(["GET", "DELETE"]);
-};
+});

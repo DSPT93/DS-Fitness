@@ -1,8 +1,8 @@
 import { dataStore, SCHEDULE_KEY, BOOKINGS_KEY } from "./lib/store.js";
 import { normalizeSchedule, computeAvailability } from "./lib/schedule.js";
-import { json, methodNotAllowed } from "./lib/http.js";
+import { json, methodNotAllowed, withErrorHandling } from "./lib/http.js";
 
-export const handler = async (event) => {
+export const handler = withErrorHandling(async (event) => {
   if (event.httpMethod !== "GET") return methodNotAllowed(["GET"]);
 
   const store = dataStore();
@@ -18,4 +18,4 @@ export const handler = async (event) => {
     slotDurationMinutes: schedule.slotDurationMinutes,
     days,
   });
-};
+});

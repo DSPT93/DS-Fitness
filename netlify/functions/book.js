@@ -6,7 +6,7 @@ import {
   CONSULTATION_TYPES,
   TRAINING_LOCATION_IDS,
 } from "./lib/schedule.js";
-import { json, methodNotAllowed } from "./lib/http.js";
+import { json, methodNotAllowed, withErrorHandling } from "./lib/http.js";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}$/;
@@ -16,7 +16,7 @@ function clean(value, maxLen) {
   return typeof value === "string" ? value.trim().slice(0, maxLen) : "";
 }
 
-export const handler = async (event) => {
+export const handler = withErrorHandling(async (event) => {
   if (event.httpMethod !== "POST") return methodNotAllowed(["POST"]);
 
   let body;
@@ -79,4 +79,4 @@ export const handler = async (event) => {
   await store.setJSON(BOOKINGS_KEY, [...existingBookings, booking]);
 
   return json(201, { booking });
-};
+});

@@ -2,11 +2,11 @@ import { dataStore, MEMBERS_KEY, plansKey } from "./lib/store.js";
 import { requireAdmin } from "./lib/auth.js";
 import { inviteMember, deleteIdentityUser } from "./lib/identityAdmin.js";
 import { normalizeMemberProfile, normalizeCheckIn } from "./lib/members.js";
-import { json, methodNotAllowed } from "./lib/http.js";
+import { json, methodNotAllowed, withErrorHandling } from "./lib/http.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const handler = async (event, context) => {
+export const handler = withErrorHandling(async (event, context) => {
   const auth = requireAdmin(context);
   if (!auth.ok) return auth.response;
 
@@ -21,7 +21,7 @@ export const handler = async (event, context) => {
         return { userId, ...profile, planCount: plans.length, latestPlanTitle: latestPlan?.title ?? null };
       })
     );
-    entries.sort((a, b) => a.name.localeCompare(b.name));
+    entries.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     return json(200, { members: entries });
   }
 
@@ -97,4 +97,4 @@ export const handler = async (event, context) => {
   }
 
   return methodNotAllowed(["GET", "POST", "PUT", "DELETE"]);
-};
+});
