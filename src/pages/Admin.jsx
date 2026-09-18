@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { openLogin, logout } from "../lib/identity";
 import { useIdentityUser } from "../lib/useIdentityUser";
+import { hasRole } from "../lib/roles";
 import {
   fetchAdminSchedule,
   saveAdminSchedule,
@@ -733,7 +734,7 @@ export default function Admin() {
     );
   }
 
-  if (!user.app_metadata?.roles?.includes("admin")) {
+  if (!hasRole(user, "admin")) {
     return (
       <section className="section admin-page">
         <div className="container admin-login">

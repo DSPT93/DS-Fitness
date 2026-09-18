@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { openLogin, logout } from "../lib/identity";
 import { useIdentityUser } from "../lib/useIdentityUser";
+import { hasRole } from "../lib/roles";
 import { fetchMemberMe, fetchMemberGlossary } from "../lib/api";
 import { business } from "../data/siteContent";
 import "./Members.css";
@@ -233,9 +234,10 @@ export default function Members() {
     );
   }
 
-  const roles = user.app_metadata?.roles ?? [];
+  const isAdmin = hasRole(user, "admin");
+  const isMember = hasRole(user, "member");
 
-  if (roles.includes("admin") && !roles.includes("member")) {
+  if (isAdmin && !isMember) {
     return (
       <section className="section members-page">
         <div className="container members-login">
@@ -249,7 +251,7 @@ export default function Members() {
     );
   }
 
-  if (!roles.includes("member")) {
+  if (!isMember) {
     return (
       <section className="section members-page">
         <div className="container members-login">

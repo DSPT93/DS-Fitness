@@ -7,8 +7,11 @@ export function getIdentityUser(context) {
   return context?.clientContext?.user ?? null;
 }
 
+// Case-insensitive: the Netlify dashboard's "Roles" field stores whatever
+// was typed verbatim, and mobile keyboards love to auto-capitalize the
+// first letter — "admin" easily becomes "Admin" without anyone noticing.
 function hasRole(user, role) {
-  return Boolean(user?.app_metadata?.roles?.includes(role));
+  return Boolean(user?.app_metadata?.roles?.some((r) => typeof r === "string" && r.toLowerCase() === role));
 }
 
 export function requireAdmin(context) {
