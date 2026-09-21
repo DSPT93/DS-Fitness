@@ -7,7 +7,7 @@ export const business = {
   trainerName: "David",
   tagline: "Strength, coached with care.",
   location: "Chiswick & Bush Hill Park",
-  email: "hello@dstraining.example",
+  email: "davidscott_pt@outlook.com",
   phone: "07479 256790",
   instagram: "https://instagram.com",
 };
