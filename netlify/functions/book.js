@@ -5,6 +5,7 @@ import {
   isSlotAvailable,
   CONSULTATION_TYPES,
   TRAINING_LOCATION_IDS,
+  modeFor,
 } from "./lib/schedule.js";
 import { json, methodNotAllowed, withErrorHandling } from "./lib/http.js";
 
@@ -59,7 +60,8 @@ export const handler = withErrorHandling(async (event) => {
   const schedule = normalizeSchedule(rawSchedule);
   const existingBookings = bookings ?? [];
 
-  if (!isSlotAvailable(schedule, existingBookings, date, time)) {
+  const mode = modeFor(type, location);
+  if (!isSlotAvailable(schedule, existingBookings, date, time, mode)) {
     return json(409, { error: "That slot is no longer available. Please choose another time." });
   }
 

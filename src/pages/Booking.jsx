@@ -79,12 +79,23 @@ export default function Booking() {
   const flow = stepFlow(type);
   const stepIndex = Math.max(flow.indexOf(step), 0);
 
+  // Mirrors modeFor() in netlify/functions/lib/schedule.js: in-person
+  // consultations draw availability from their location, phone and video
+  // both draw from the shared "phone" availability.
+  const mode = useMemo(() => {
+    if (!type) return null;
+    return type === "in-person" ? location : "phone";
+  }, [type, location]);
+
   useEffect(() => {
-    if (step !== "calendar" || days) return;
+    if (step !== "calendar" || !mode) return;
     let cancelled = false;
-    fetchAvailability()
+    fetchAvailability(mode)
       .then((data) => {
-        if (!cancelled) setDays(data.days.filter((d) => d.slots.length > 0));
+        if (!cancelled) {
+          setDays(data.days.filter((d) => d.slots.length > 0));
+          setAvailabilityError(null);
+        }
       })
       .catch((err) => {
         if (!cancelled) setAvailabilityError(err.message);
@@ -92,17 +103,25 @@ export default function Booking() {
     return () => {
       cancelled = true;
     };
-  }, [step, days]);
+  }, [step, mode]);
 
   const activeDay = useMemo(() => days?.find((d) => d.date === selectedDate) ?? null, [days, selectedDate]);
 
   function selectType(id) {
     setType(id);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setDays(null);
+    setAvailabilityError(null);
     setStep(id === "in-person" ? "location" : "calendar");
   }
 
   function selectLocation(id) {
     setLocation(id);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setDays(null);
+    setAvailabilityError(null);
     setStep("calendar");
   }
 

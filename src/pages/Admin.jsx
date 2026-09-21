@@ -24,6 +24,16 @@ import "./Admin.css";
 
 const LOCATION_NAMES = Object.fromEntries(trainingLocations.map((l) => [l.id, l.name]));
 
+// Mirrors AVAILABILITY_MODES / AVAILABILITY_MODE_LABELS in
+// netlify/functions/lib/schedule.js — each mode has its own independently
+// editable weekly hours, since some days might be phone-only, others
+// in-person at one location plus phone, etc.
+const AVAILABILITY_MODES = [...trainingLocations.map((l) => l.id), "phone"];
+const AVAILABILITY_MODE_LABELS = {
+  ...Object.fromEntries(trainingLocations.map((l) => [l.id, `${l.name} (in person)`])),
+  phone: "Phone / video",
+};
+
 const WEEKDAYS = [
   ["mon", "Monday"],
   ["tue", "Tuesday"],
@@ -47,6 +57,7 @@ function ScheduleEditor() {
   const [error, setError] = useState(null);
   const [savedAt, setSavedAt] = useState(null);
   const [newBlockedDate, setNewBlockedDate] = useState("");
+  const [mode, setMode] = useState(AVAILABILITY_MODES[0]);
 
   useEffect(() => {
     fetchAdminSchedule()
@@ -60,22 +71,28 @@ function ScheduleEditor() {
 
   function updateRange(day, idx, field, value) {
     setSchedule((s) => {
-      const ranges = s.weekly[day].map((r, i) => (i === idx ? { ...r, [field]: value } : r));
-      return { ...s, weekly: { ...s.weekly, [day]: ranges } };
+      const ranges = s.weekly[mode][day].map((r, i) => (i === idx ? { ...r, [field]: value } : r));
+      return { ...s, weekly: { ...s.weekly, [mode]: { ...s.weekly[mode], [day]: ranges } } };
     });
   }
 
   function addRange(day) {
     setSchedule((s) => ({
       ...s,
-      weekly: { ...s.weekly, [day]: [...s.weekly[day], { start: "09:00", end: "17:00" }] },
+      weekly: {
+        ...s.weekly,
+        [mode]: { ...s.weekly[mode], [day]: [...s.weekly[mode][day], { start: "09:00", end: "17:00" }] },
+      },
     }));
   }
 
   function removeRange(day, idx) {
     setSchedule((s) => ({
       ...s,
-      weekly: { ...s.weekly, [day]: s.weekly[day].filter((_, i) => i !== idx) },
+      weekly: {
+        ...s.weekly,
+        [mode]: { ...s.weekly[mode], [day]: s.weekly[mode][day].filter((_, i) => i !== idx) },
+      },
     }));
   }
 
@@ -113,9 +130,23 @@ function ScheduleEditor() {
       <div className="admin-panel-header">
         <h2>Weekly availability</h2>
         <p className="admin-muted">
-          Set the hours you're free for free consultations each week. Clients will only ever see
-          slots inside these windows that aren't already booked.
+          Each way of meeting has its own hours — set Chiswick, Bush Hill Park and Phone/video
+          separately. A day can be phone-only, in-person-only, both, or neither; clients will only
+          ever see slots inside these windows that aren't already booked.
         </p>
+      </div>
+
+      <div className="admin-mode-switch">
+        {AVAILABILITY_MODES.map((m) => (
+          <button
+            key={m}
+            type="button"
+            className={`admin-mode-btn ${mode === m ? "admin-mode-btn-active" : ""}`}
+            onClick={() => setMode(m)}
+          >
+            {AVAILABILITY_MODE_LABELS[m]}
+          </button>
+        ))}
       </div>
 
       <label className="admin-slot-duration">
@@ -135,8 +166,8 @@ function ScheduleEditor() {
           <div key={key} className="admin-day-row">
             <div className="admin-day-name">{label}</div>
             <div className="admin-day-ranges">
-              {schedule.weekly[key].length === 0 && <span className="admin-muted">Unavailable</span>}
-              {schedule.weekly[key].map((range, idx) => (
+              {schedule.weekly[mode][key].length === 0 && <span className="admin-muted">Unavailable</span>}
+              {schedule.weekly[mode][key].map((range, idx) => (
                 <div key={idx} className="admin-range">
                   <input
                     type="time"

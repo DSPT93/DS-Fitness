@@ -26,8 +26,8 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
   return data;
 }
 
-export function fetchAvailability() {
-  return request("/api/availability");
+export function fetchAvailability(mode) {
+  return request(`/api/availability?mode=${encodeURIComponent(mode)}`);
 }
 
 export function submitBooking(payload) {

@@ -15,45 +15,59 @@ export const CONSULTATION_TYPES = ["in-person", "phone", "video"];
 // Keep in sync with `trainingLocations` in src/data/siteContent.js.
 export const TRAINING_LOCATION_IDS = ["chiswick", "bush-hill-park"];
 
+// Availability is tracked separately per mode so a day can be, say,
+// phone-only, in-person-only at one location, or any combination — each
+// mode has its own independently editable weekly hours. Phone and video
+// share the same "phone" availability (David is either free for a remote
+// call at a given time or he isn't; which remote format the client picks
+// doesn't change that), while each physical location is tracked on its own
+// since he can only be in one place at a time.
+export const AVAILABILITY_MODES = ["chiswick", "bush-hill-park", "phone"];
+
+export const AVAILABILITY_MODE_LABELS = {
+  chiswick: "Chiswick (in person)",
+  "bush-hill-park": "Bush Hill Park (in person)",
+  phone: "Phone / video",
+};
+
+// Maps a booking's { type, location } to the availability mode that governs
+// it. In-person consultations are governed by their location; phone and
+// video both draw from the shared "phone" mode.
+export function modeFor(type, location) {
+  return type === "in-person" ? location : "phone";
+}
+
+function emptyWeek() {
+  return Object.fromEntries(WEEKDAYS.map((day) => [day, []]));
+}
+
 export const DEFAULT_SCHEDULE = {
   slotDurationMinutes: 30,
   horizonDays: 28,
-  weekly: {
-    sun: [],
-    mon: [
-      { start: "06:00", end: "09:00" },
-      { start: "17:00", end: "20:00" },
-    ],
-    tue: [
-      { start: "06:00", end: "09:00" },
-      { start: "17:00", end: "20:00" },
-    ],
-    wed: [
-      { start: "06:00", end: "09:00" },
-      { start: "17:00", end: "20:00" },
-    ],
-    thu: [
-      { start: "06:00", end: "09:00" },
-      { start: "17:00", end: "20:00" },
-    ],
-    fri: [
-      { start: "06:00", end: "09:00" },
-      { start: "17:00", end: "20:00" },
-    ],
-    sat: [{ start: "09:00", end: "12:00" }],
-  },
+  // Empty by default rather than seeded with example hours — showing made-up
+  // availability to clients before it's actually configured would be worse
+  // than showing none.
+  weekly: Object.fromEntries(AVAILABILITY_MODES.map((mode) => [mode, emptyWeek()])),
   blockedDates: [],
 };
+
+function normalizeWeek(raw) {
+  const week = emptyWeek();
+  for (const day of WEEKDAYS) {
+    const ranges = Array.isArray(raw?.[day]) ? raw[day] : [];
+    week[day] = ranges
+      .filter((r) => r && typeof r.start === "string" && typeof r.end === "string")
+      .map((r) => ({ start: r.start, end: r.end }));
+  }
+  return week;
+}
 
 export function normalizeSchedule(raw) {
   if (!raw || typeof raw !== "object") return structuredClone(DEFAULT_SCHEDULE);
 
   const weekly = {};
-  for (const day of WEEKDAYS) {
-    const ranges = Array.isArray(raw.weekly?.[day]) ? raw.weekly[day] : [];
-    weekly[day] = ranges
-      .filter((r) => r && typeof r.start === "string" && typeof r.end === "string")
-      .map((r) => ({ start: r.start, end: r.end }));
+  for (const mode of AVAILABILITY_MODES) {
+    weekly[mode] = normalizeWeek(raw.weekly?.[mode]);
   }
 
   return {
@@ -83,12 +97,15 @@ function toDateKey(date) {
 
 /**
  * Builds the list of bookable days/slots for the next `schedule.horizonDays`
- * days, excluding blocked dates, already-booked slots, and (for today) any
- * slot that has already started.
+ * days, for a single availability mode (a location, or "phone"). Excludes
+ * blocked dates, and any slot already taken by a booking in ANY mode — David
+ * can only run one consultation at a time regardless of its type, so a
+ * booking in one mode blocks that date/time across every other mode too.
  */
-export function computeAvailability(schedule, bookings, { now = new Date() } = {}) {
+export function computeAvailability(schedule, bookings, mode, { now = new Date() } = {}) {
   const bookedSet = new Set(bookings.map((b) => `${b.date}T${b.time}`));
   const blockedSet = new Set(schedule.blockedDates);
+  const week = schedule.weekly[mode] ?? emptyWeek();
   const days = [];
 
   for (let offset = 0; offset < schedule.horizonDays; offset++) {
@@ -103,7 +120,7 @@ export function computeAvailability(schedule, bookings, { now = new Date() } = {
       continue;
     }
 
-    const ranges = schedule.weekly[weekday] ?? [];
+    const ranges = week[weekday] ?? [];
     const slots = [];
 
     for (const range of ranges) {
@@ -127,8 +144,8 @@ export function computeAvailability(schedule, bookings, { now = new Date() } = {
   return days;
 }
 
-export function isSlotAvailable(schedule, bookings, date, time) {
-  const days = computeAvailability(schedule, bookings, { now: new Date() });
+export function isSlotAvailable(schedule, bookings, date, time, mode) {
+  const days = computeAvailability(schedule, bookings, mode, { now: new Date() });
   const day = days.find((d) => d.date === date);
   return Boolean(day && day.slots.includes(time));
 }
